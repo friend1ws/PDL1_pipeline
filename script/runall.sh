@@ -7,6 +7,7 @@ while read line
 do
     SAMPLE=`echo ${line} | cut -f 1 -d ' '`
     BAMPATH=`echo ${line} | cut -f 2 -d ' '`
+    CHIMERAPATH=`echo ${line} | cut -f 3 -d ' '`
 
     if [ ! -d ${OUTPUTDIR}/fusion/${SAMPLE} ]
     then
@@ -19,8 +20,8 @@ do
     fi
 
 
-    echo "qsub -l s_vmem=6G,mem_req=6G fusionfusion.sh ${BAMPATH} ${OUTPUTDIR}/fusion/${SAMPLE}"
-    qsub -l s_vmem=6G,mem_req=6G fusionfusion.sh ${BAMPATH} ${OUTPUTDIR}/fusion/${SAMPLE} 
+    echo "qsub -l s_vmem=6G,mem_req=6G fusion_script/fusionfusion.sh ${CHIMERAPATH} ${OUTPUTDIR}/fusion/${SAMPLE}"
+    qsub -l s_vmem=6G,mem_req=6G fusion_script/fusionfusion.sh ${CHIMERAPATH} ${OUTPUTDIR}/fusion/${SAMPLE} 
 
 done < ${INPUT}
 

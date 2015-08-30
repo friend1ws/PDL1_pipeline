@@ -13,6 +13,6 @@ export PATH=/home/yshira/.local/bin:${PATH}
 FILEPATH=$1
 OUTPUTDIR=$2
 
-echo "fusionfusion --star ${FILEPATH} --out ${OUTPUTDIR} --param param.cfg"
-fusionfusion --star ${FILEPATH} --out ${OUTPUTDIR} --param param.cfg
+echo "fusionfusion --star ${FILEPATH} --out ${OUTPUTDIR} --param fusion_script/param.cfg"
+fusionfusion --star ${FILEPATH} --out ${OUTPUTDIR} --param fusion_script/param.cfg
 
