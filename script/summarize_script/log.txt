@@ -1,0 +1,2 @@
+
+python summary.py ../../TCGA_expression/result/selected_samples.txt ../exp/result/ ../fusion/result/ | sort -u | sort -k2,2 -k1,1 > pilot1198.txt
