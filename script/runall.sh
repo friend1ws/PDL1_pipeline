@@ -19,9 +19,12 @@ do
         mkdir -p ${OUTPUTDIR}/exp/${SAMPLE}
     fi
 
-
     echo "qsub -l s_vmem=6G,mem_req=6G fusion_script/fusionfusion.sh ${CHIMERAPATH} ${OUTPUTDIR}/fusion/${SAMPLE}"
     qsub -l s_vmem=6G,mem_req=6G fusion_script/fusionfusion.sh ${CHIMERAPATH} ${OUTPUTDIR}/fusion/${SAMPLE} 
+
+    echo "qsub -l s_vmem=2G,mem_req=2G exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt"
+    qsub -l s_vmem=2G,mem_req=2G exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt 
+
 
 done < ${INPUT}
 
