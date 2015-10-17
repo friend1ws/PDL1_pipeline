@@ -19,17 +19,20 @@ do
         mkdir -p ${OUTPUTDIR}/exp/${SAMPLE}
     fi
 
+    echo "qsub exp_script/genomon_expression.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/${SAMPLE} exp_script/resource/refGene.bed"
+    qsub exp_script/genomon_expression.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/${SAMPLE} exp_script/resource/refGene.bed
+ 
     # echo "qsub -l s_vmem=6G,mem_req=6G fusion_script/fusionfusion.sh ${CHIMERAPATH} ${OUTPUTDIR}/fusion/${SAMPLE}"
     # qsub -l s_vmem=6G,mem_req=6G fusion_script/fusionfusion.sh ${CHIMERAPATH} ${OUTPUTDIR}/fusion/${SAMPLE} 
 
     # echo "qsub -l s_vmem=2G,mem_req=2G exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt"
     # qsub -l s_vmem=2G,mem_req=2G exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt 
 
-    # echo "exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt"
-    # sh exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt
+    # echo "qsub exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt"
+    # qsub exp_script/getCD274Exp.sh ${BAMPATH} ${OUTPUTDIR}/exp/${SAMPLE}/CD274.exon.exp.txt
 
 done < ${INPUT}
 
-echo "python summarize_script/summary_phs.py ${INPUT} ${OUTPUTDIR}/exp ${OUTPUTDIR}/fusion > ${OUTPUTDIR}/summary.txt"
-python summarize_script/summary_phs.py ${INPUT} ${OUTPUTDIR}/exp ${OUTPUTDIR}/fusion > ${OUTPUTDIR}/summary.txt
+# echo "python summarize_script/summary_phs.py ${INPUT} ${OUTPUTDIR}/exp ${OUTPUTDIR}/fusion > ${OUTPUTDIR}/summary.txt"
+# python summarize_script/summary_phs.py ${INPUT} ${OUTPUTDIR}/exp ${OUTPUTDIR}/fusion > ${OUTPUTDIR}/summary.txt
 
