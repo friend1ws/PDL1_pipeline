@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from genomon_pipeline.stage_task import *
+from stage_task import *
 
 class Virus_count(Stage_task):
 
@@ -26,9 +26,9 @@ export PATH=$PYTHONHOME/bin:$PATH
 export LD_LIBRARY_PATH={ld_library_path}
 export PYTHONPATH={pythonpath}
 
-{genomon_virus_checker} -q {match_thres} {input_fastq_1} {input_fastq_2} {output} {virus_ref}
+{genomon_virus_checker} -q {match_thres} {input_fastq_1} {input_fastq_2} {output_prefix} {virus_ref}
 """
 
-    def __init__(self, qsub_option, script_dir):
-        super(Virus_count, self).__init__(qsub_option, script_dir)
+    def __init__(self, qsub_option, script_dir, log_dir):
+        super(Virus_count, self).__init__(qsub_option, script_dir, log_dir)
 

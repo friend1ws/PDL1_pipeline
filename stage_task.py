@@ -3,19 +3,19 @@
 import os
 import sys
 import datetime
-import subprocess
 import drmaa
 
 file_timestamp_format = "{name}_{year:0>4d}{month:0>2d}{day:0>2d}_{hour:0>2d}{min:0>2d}_{msecond:0>6d}"
 
 class Stage_task(object):
 
-    def __init__(self, qsub_option):
+    def __init__(self, qsub_option, script_dir, log_dir):
         self.qsub_option = qsub_option
         self.retry_count = 2
+        self.script_dir = script_dir
+        self.log_dir = log_dir
 
-
-    def task_exec(self, arguments, script_dir, log_dir, max_task = 0):
+    def task_exec(self, arguments, max_task = 0):
         # Make shell script
 
         now = datetime.datetime.now()
@@ -28,19 +28,18 @@ class Stage_task(object):
                                  min=now.minute,
                                  msecond=now.microsecond )
         
-        shell_script_full_path = "{script}/{file}.sh".format(script = script_dir, file = shell_script_name)
+        shell_script_full_path = "{script}/{file}.sh".format(script = self.script_dir, file = shell_script_name)
         shell_script_file = open(shell_script_full_path, 'w')
         shell_script_file.write(self.script_template.format(**arguments))
         shell_script_file.close()
 
-        
         s = drmaa.Session()
         s.initialize()
     
         jt = s.createJobTemplate()
         jt.jobName = shell_script_name
-        jt.outputPath = ':' + log_dir
-        jt.errorPath = ':' + log_dir
+        jt.outputPath = ':' + self.log_dir
+        jt.errorPath = ':' + self.log_dir
         jt.nativeSpecification = self.qsub_option
         jt.remoteCommand = shell_script_full_path
         os.chmod(shell_script_full_path, 0750)
