@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 
-import sys, os, argparse
+import sys, os, glob, argparse
 import ConfigParser
 from ruffus import *
 
-from read_input import *
+from utility import *
 from stage_task import *
 from resource.virus_count import *
+from resource.star_ref import *
 
 ##########
 # store arguments
@@ -36,6 +37,7 @@ abs_output_root = os.path.abspath(args.output_dir)
 # set task classes
 
 virus_count = Virus_count(pipeline_conf.get("virus_count", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
+star_ref = Star_ref(pipeline_conf.get("star_ref", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
 # star_align = Star_align(task_conf.get("star_align", "qsub_option"), run_conf.project_root + '/script')###
 ##########
 
@@ -85,24 +87,43 @@ def link_input_fastq(output_file, sample_list_fastq):
 
 # count virus sequence
 @transform(link_input_fastq, formatter(), "{subpath[0][2]}/virus_count/{subdir[0][0]}/{subdir[0][0]}.virus.base.txt")
-def task_Virus_count(input_files, output_file):
+def task_virus_count(input_files, output_file):
 
     dir_name = os.path.dirname(output_file)
     sample_name = os.path.basename(dir_name)
 
-    arguments = {"pythonhome": pipeline_conf.get("common", "PYTHONHOME"),
-                 "pythonpath": pipeline_conf.get("common", "PYTHONPATH"),
-                 "ld_library_path": pipeline_conf.get("common", "LD_LIBRARY_PATH"),
+    arguments = {"pythonhome": pipeline_conf.get("env", "PYTHONHOME"),
+                 "pythonpath": pipeline_conf.get("env", "PYTHONPATH"),
+                 "ld_library_path": pipeline_conf.get("env", "LD_LIBRARY_PATH"),
                  "genomon_virus_checker": pipeline_conf.get("virus_count", "genomon_virus_checker"),
                  "virus_ref": pipeline_conf.get("virus_count", "virus_reference"),
                  "match_thres": pipeline_conf.get("virus_count", "match_thres"),
                  "input_fastq_1": input_files[0],
                  "input_fastq_2": input_files[1],
-                 "output_prefix": dir_name + '/' + sample_name,
-                 "log": abs_output_root + "/log"}
+                 "output_prefix": dir_name + '/' + sample_name}
 
     if not os.path.isdir(dir_name): os.mkdir(dir_name)
     virus_count.task_exec(arguments)
+
+
+@follows(task_virus_count)
+@originate([abs_output_root + "/star_ref/" + x + "/SAindex" for x in selected_virus_list(abs_output_root + "/virus_count", 500)])
+def make_star_ref(output_file):
+
+    star_ref_dir = os.path.dirname(output_file) 
+    selected_virus = os.path.basename(star_ref_dir)
+
+    if not os.path.isdir(star_ref_dir): os.mkdir(star_ref_dir)
+    print_virus_seq(pipeline_conf.get("virus_count", "virus_reference"),
+                    star_ref_dir + '/' + selected_virus + ".fa", selected_virus)
+
+    arguments = {"star": pipeline_conf.get("software", "star"),
+                 "human_ref": pipeline_conf.get("reference", "ref_fasta"),
+                 "virus_ref": star_ref_dir + '/' + selected_virus + ".fa",
+                 "output_dir": star_ref_dir,
+                 "gtf_file": pipeline_conf.get("reference", "gtf_file")}
+ 
+    star_ref.task_exec(arguments)
 
 pipeline_run(multiprocess = 100)
 

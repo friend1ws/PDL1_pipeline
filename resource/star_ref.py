@@ -2,9 +2,9 @@
 
 from stage_task import *
 
-class Virus_count(Stage_task):
+class Star_ref(Stage_task):
 
-    task_name = "virus_count"
+    task_name = "star_ref"
 
     script_template = """
 #!/bin/bash
@@ -18,15 +18,11 @@ hostname                # print hostname
 date                    # print date
 set -xv
 
-# set python environment
-export PYTHONHOME={pythonhome}
-export PATH=$PYTHONHOME/bin:$PATH
-export LD_LIBRARY_PATH={ld_library_path}
-export PYTHONPATH={pythonpath}
+cat {human_ref} {virus_ref} > {output_dir}/reference.fa
 
-{genomon_virus_checker} -q {match_thres} {input_fastq_1} {input_fastq_2} {output_prefix} {virus_ref}
+{star} --runThreadN 8 --runMode genomeGenerate --genomeDir {output_dir} --genomeFastaFiles {output_dir}/reference.fa --sjdbGTFfile {gtf_file} --sjdbOverhang 100
 """
 
     def __init__(self, qsub_option, script_dir, log_dir):
-        super(Virus_count, self).__init__(qsub_option, script_dir, log_dir)
+        super(Star_ref, self).__init__(qsub_option, script_dir, log_dir)
 
