@@ -1,2 +1,2 @@
-# CD274_proj
-script for CD274 project
+# PDL1_pipeline 
+script for CD274 analysis 
