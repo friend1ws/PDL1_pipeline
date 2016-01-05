@@ -25,20 +25,15 @@ def read_input(input_file):
 
 
 # function for listing up selected virus
-def selected_virus_list(check_dir, thres):
+def selected_virus_list(check_dir):
     virus_list = []
-    allfiles = glob.glob(check_dir + "/*/*.virus.base.txt")
+    allfiles = glob.glob(check_dir + "/*/*.virus.selected.txt")
     for file in allfiles:
-        temp_base_count = 0
-        temp_virus = None
         with open(file, 'r') as hin:
             for line in hin:
-                F = line.rstrip('\n').split('\t')
-                if int(F[1]) > temp_base_count and int(F[1]) > thres:
-                    temp_base_count = int(F[1])
-                    temp_virus = F[0]
+                temp_virus = line.rstrip('\n')
 
-        if temp_virus is not None and temp_virus not in virus_list: virus_list.append(temp_virus)
+        if temp_virus != "None" and temp_virus not in virus_list: virus_list.append(temp_virus)
 
     return virus_list
 
@@ -63,3 +58,16 @@ def print_virus_seq(virus_fa, output_file, selected_virus):
 
     hout.close()
 
+
+def generate_virus_fusionfusion_param(input_param_file, output_param_file, reference):
+
+    hout = open(output_param_file, 'w')
+    with open(input_param_file, 'r') as hin:
+        for line in hin:
+            line = line.rstrip('\n')
+            if line.startswith("reference_genome"):
+                print >> hout, "reference_genome = " + reference
+            else:
+                print >> hout, line
+
+    hout.close()

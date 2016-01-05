@@ -8,6 +8,8 @@ from utility import *
 from stage_task import *
 from resource.virus_count import *
 from resource.star_ref import *
+from resource.star_align import *
+from resource.fusionfusion import *
 
 ##########
 # store arguments
@@ -38,7 +40,9 @@ abs_output_root = os.path.abspath(args.output_dir)
 
 virus_count = Virus_count(pipeline_conf.get("virus_count", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
 star_ref = Star_ref(pipeline_conf.get("star_ref", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
-# star_align = Star_align(task_conf.get("star_align", "qsub_option"), run_conf.project_root + '/script')###
+star_align = Star_align(pipeline_conf.get("star_align", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
+fusionfusion = Fusionfusion(pipeline_conf.get("fusionfusion", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
+
 ##########
 
 
@@ -86,7 +90,7 @@ def link_input_fastq(output_file, sample_list_fastq):
 
 
 # count virus sequence
-@transform(link_input_fastq, formatter(), "{subpath[0][2]}/virus_count/{subdir[0][0]}/{subdir[0][0]}.virus.base.txt")
+@transform(link_input_fastq, formatter(), "{subpath[0][2]}/virus_count/{subdir[0][0]}/{subdir[0][0]}.virus.selected.txt")
 def task_virus_count(input_files, output_file):
 
     dir_name = os.path.dirname(output_file)
@@ -98,6 +102,7 @@ def task_virus_count(input_files, output_file):
                  "genomon_virus_checker": pipeline_conf.get("virus_count", "genomon_virus_checker"),
                  "virus_ref": pipeline_conf.get("virus_count", "virus_reference"),
                  "match_thres": pipeline_conf.get("virus_count", "match_thres"),
+                 "select_thres": pipeline_conf.get("virus_count", "select_thres"),
                  "input_fastq_1": input_files[0],
                  "input_fastq_2": input_files[1],
                  "output_prefix": dir_name + '/' + sample_name}
@@ -107,7 +112,7 @@ def task_virus_count(input_files, output_file):
 
 
 @follows(task_virus_count)
-@originate([abs_output_root + "/star_ref/" + x + "/SAindex" for x in selected_virus_list(abs_output_root + "/virus_count", 500)])
+@originate([abs_output_root + "/star_ref/" + x + "/SAindex" for x in selected_virus_list(abs_output_root + "/virus_count")])
 def make_star_ref(output_file):
 
     star_ref_dir = os.path.dirname(output_file) 
@@ -124,6 +129,70 @@ def make_star_ref(output_file):
                  "gtf_file": pipeline_conf.get("reference", "gtf_file")}
  
     star_ref.task_exec(arguments)
+
+
+@follows(make_star_ref)
+@transform(link_input_fastq, formatter(), "{subpath[0][2]}/star/{subdir[0][0]}/{subdir[0][0]}.Aligned.sortedByCoord.out.bam")
+def task_star_align(input_files, output_file):
+
+    dir_name = os.path.dirname(output_file)
+    sample_name = os.path.basename(dir_name)
+
+    # check the selected virus
+    selected_virus = ""
+    with open(abs_output_root + "/virus_count/" + sample_name + "/" + sample_name + ".virus.selected.txt") as hin:
+        line = hin.readlines()
+        selected_virus = line[0].rstrip('\n')
+
+    star_genome = pipeline_conf.get("reference", "star_ref")
+    if selected_virus != "None":
+        star_genome = abs_output_root + "/star_ref/" + selected_virus
+
+    arguments = {"star": pipeline_conf.get("software", "star"),
+                 "star_genome": star_genome,
+                 "additional_params": pipeline_conf.get("star_align", "star_params"),
+                 "samtools": pipeline_conf.get("software", "samtools"),
+                 "samtools_sort_params": pipeline_conf.get("star_align", "samtools_sort_params"),
+                 "fastq1": input_files[0],
+                 "fastq2": input_files[1],
+                 "out_prefix": dir_name + '/' + sample_name + '.'}
+
+    if not os.path.isdir(dir_name): os.mkdir(dir_name)
+    star_align.task_exec(arguments)
+
+
+@transform(task_star_align, formatter(), "{subpath[0][2]}/fusion/{subdir[0][0]}/fusion_fusion.result.txt")
+def task_fusionfusion(input_file, output_file):
+
+    input_dir_name = os.path.dirname(input_file)
+    sample_name = os.path.basename(input_dir_name)
+    input_chimeric_sam = input_dir_name + '/' + sample_name + ".Chimeric.out.sam"
+    output_dir_name = os.path.dirname(output_file) 
+
+    if not os.path.isdir(output_dir_name): os.mkdir(output_dir_name)
+
+    # check the selected virus
+    selected_virus = ""
+    with open(abs_output_root + "/virus_count/" + sample_name + "/" + sample_name + ".virus.selected.txt") as hin:
+        line = hin.readlines()
+        selected_virus = line[0].rstrip('\n')
+
+    reference = abs_output_root + "/star_ref/" + selected_virus + "/reference.fa" if selected_virus != "None" \
+                    else pipeline_conf.get("reference", "ref_fasta")
+
+    generate_virus_fusionfusion_param(pipeline_conf.get("fusionfusion", "param_file"),
+                                      output_dir_name + "/param.cfg",
+                                      reference)                                        
+
+    arguments = {"fusionfusion": pipeline_conf.get("software", "fusionfusion"),
+                 "star_chimeric_sam": input_chimeric_sam,
+                 "output_prefix": output_dir_name,
+                 "param_file": output_dir_name + "/param.cfg",
+                 "pythonhome": pipeline_conf.get("env", "PYTHONHOME"),
+                 "pythonpath": pipeline_conf.get("env", "PYTHONPATH"),   
+                 "ld_library_path": pipeline_conf.get("env", "LD_LIBRARY_PATH")}
+
+    fusionfusion.task_exec(arguments)
 
 pipeline_run(multiprocess = 100)
 
