@@ -2,7 +2,7 @@
 
 import os, csv, glob
 
-def read_input(input_file):
+def read_input_fastq(input_file):
 
     sample2fastq = {}
     sample_list = {}
@@ -24,14 +24,47 @@ def read_input(input_file):
     return sample2fastq
 
 
+def read_input_star_prefix(input_file):
+
+    sample2star_prefix = {}
+    sample_list = {}
+
+    with open(input_file, 'r') as hin:
+        csv_obj = csv.reader(hin)
+        for cells in csv_obj:
+
+            sample = cells[0]
+            star_prefix = cells[1]
+
+            if sample in sample_list: raise ValueError("Duplicated sample ID: " + sample)
+
+            if not os.path.exists(star_prefix + ".Aligned.sortedByCoord.out.bam"):
+                raise ValueError("File Not Exist:" + star_prefix + ".Aligned.sortedByCoord.out.bam")
+            if not os.path.exists(star_prefix + ".Chimeric.out.sam"):
+                raise ValueError("File Not Exist:" + star_prefix + ".Chimeric.out.sam")
+            if not os.path.exists(star_prefix + ".SJ.out.tab"):
+                raise ValueError("File Not Exist:" + star_prefix + ".SJ.out.tab")
+            if not os.path.exists(star_prefix + ".Log.final.out"):
+                raise ValueError("File Not Exist:" + star_prefix + ".Log.final.out")
+            if not os.path.exists(star_prefix + ".Aligned.sortedByCoord.out.bam.bai"):
+                raise ValueError("File Not Exist:" + star_prefix + ".Aligned.sortedByCoord.out.bam.bai")
+
+            sample_list[sample] = 1
+            sample2star_prefix[sample] = star_prefix
+
+    return sample2star_prefix
+
+
 # function for listing up selected virus
 def selected_virus_list(check_dir):
     virus_list = []
     allfiles = glob.glob(check_dir + "/*/*.virus.selected.txt")
     for file in allfiles:
+        temp_virus = "None"
         with open(file, 'r') as hin:
-            for line in hin:
-                temp_virus = line.rstrip('\n')
+            line = hin.readlines()
+            temp_virus = line[0].rstrip('\n')
+
 
         if temp_virus != "None" and temp_virus not in virus_list: virus_list.append(temp_virus)
 
@@ -71,3 +104,22 @@ def generate_virus_fusionfusion_param(input_param_file, output_param_file, refer
                 print >> hout, line
 
     hout.close()
+
+
+
+def get_sequence_with_virus(input_dir, sample_list_fastq):
+
+    # generate list of linked_fastq file path
+    bam_list = []
+    for sample in sample_list_fastq:
+        # check the selected virus
+        with open(input_dir + "/virus_count/" + sample + "/" + sample + ".virus.selected.txt") as hin:
+            line = hin.readlines()
+            selected_virus = line[0].rstrip('\n')
+            if selected_virus != "None":
+                bam_list.append(input_dir + "/star/" + sample + "/" + sample + ".Aligned.sortedByCoord.out.bam")
+
+    print '\n'.join(bam_list)
+    return bam_list
+
+

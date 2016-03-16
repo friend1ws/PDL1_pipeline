@@ -20,7 +20,13 @@ set -xv
 
 cat {human_ref} {virus_ref} > {output_dir}/reference.fa
 
-{star} --runThreadN 8 --runMode genomeGenerate --genomeDir {output_dir} --genomeFastaFiles {output_dir}/reference.fa --sjdbGTFfile {gtf_file} --sjdbOverhang 100
+{star} --runThreadN 8 \
+        --runMode genomeGenerate \
+        --genomeDir {output_dir} \
+        --outFileNamePrefix {output_dir} \
+        --genomeFastaFiles {output_dir}/reference.fa \
+        --sjdbGTFfile {gtf_file} \
+        --sjdbOverhang 100
 """
 
     def __init__(self, qsub_option, script_dir, log_dir):

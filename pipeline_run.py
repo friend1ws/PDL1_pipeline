@@ -10,6 +10,8 @@ from resource.virus_count import *
 from resource.star_ref import *
 from resource.star_align import *
 from resource.fusionfusion import *
+from resource.exon_base_count import *
+from resource.genomon_expression import *
 
 ##########
 # store arguments
@@ -21,8 +23,10 @@ parser.add_argument("--version", action = "version", version = "pdl1_pipeline-0.
 parser.add_argument("input_fastq_list", metavar = "input_fastq_list.txt", default = None, type = str,
                     help = "input sample fastq list")
 
-parser.add_argument("output_dir", metavar = "output root directory", default = None, type = str,
+parser.add_argument("output_dir", metavar = "output_root_directory", default = None, type = str,
                     help = "output root directory")
+
+parser.add_argument("--bam", help = "start from aligned bam files", action = "store_true", default = False)
 
 parser.add_argument("--mouse", help = "mouse rna-seq analysis", action = "store_true", default = False)
 
@@ -42,17 +46,13 @@ virus_count = Virus_count(pipeline_conf.get("virus_count", "qsub_option"), abs_o
 star_ref = Star_ref(pipeline_conf.get("star_ref", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
 star_align = Star_align(pipeline_conf.get("star_align", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
 fusionfusion = Fusionfusion(pipeline_conf.get("fusionfusion", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
+exon_base_count = Exon_base_count(pipeline_conf.get("exon_base_count", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
+genomon_expression = Genomon_expression(pipeline_conf.get("expression", "qsub_option"), abs_output_root + "/script", abs_output_root + "/log")
 
 ##########
 
 
 ##########
-# read input file
-
-sample_list_fastq = read_input(args.input_fastq_list)
-
-##########
-
 
 ##########
 # prepare output directories
@@ -65,32 +65,59 @@ if not os.path.isdir(abs_output_root + '/virus_count'): os.mkdir(abs_output_root
 if not os.path.isdir(abs_output_root + '/star_ref'): os.mkdir(abs_output_root + '/star_ref')
 if not os.path.isdir(abs_output_root + '/star'): os.mkdir(abs_output_root + '/star')
 if not os.path.isdir(abs_output_root + '/fusion'): os.mkdir(abs_output_root + '/fusion')
+if not os.path.isdir(abs_output_root + '/expression'): os.mkdir(abs_output_root + '/expression')
+if not os.path.isdir(abs_output_root + '/exon_base_count'): os.mkdir(abs_output_root + '/exon_base_count')
 
 ###########
 
-
-
-# generate list of linked_fastq file path
 linked_fastq_list = []
-for sample in sample_list_fastq:
-    linked_fastq_list.append([abs_output_root + '/fastq/' + sample + '/1.fastq',
-                              abs_output_root + '/fastq/' + sample + '/2.fastq'])
+# if input is fastq
+if not args.bam:
+    
+    # read input file
+    sample_list_fastq = read_input_fastq(args.input_fastq_list)
 
+    # link the input fastq files
+    # generate list of linked_fastq file path
+    for sample in sample_list_fastq:
+        link_dir = abs_output_root + '/fastq/' + sample
+        if not os.path.isdir(link_dir): os.mkdir(link_dir)
+        if not os.path.exists(link_dir + '/1.fastq'): os.symlink(sample_list_fastq[sample][0], link_dir + '/1.fastq')
+        if not os.path.exists(link_dir + '/2.fastq'): os.symlink(sample_list_fastq[sample][1], link_dir + '/2.fastq')
+        linked_fastq_list.append([abs_output_root + '/fastq/' + sample + '/1.fastq',
+                                  abs_output_root + '/fastq/' + sample + '/2.fastq'])
 
-# link the input fastq files
-@originate(linked_fastq_list, sample_list_fastq)
-def link_input_fastq(output_file, sample_list_fastq):
-    sample = os.path.basename(os.path.dirname(output_file[0]))
-    link_dir = abs_output_root + '/fastq/' + sample
-    print link_dir
+    # generate list of aligned bam file path
+    star_bam_list = []
+    for sample in sample_list_fastq:
+        star_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
 
-    if not os.path.isdir(link_dir): os.mkdir(link_dir)
-    if not os.path.exists(link_dir + '/1.fastq'): os.symlink(sample_list_fastq[sample][0], link_dir + '/1.fastq')
-    if not os.path.exists(link_dir + '/2.fastq'): os.symlink(sample_list_fastq[sample][1], link_dir + '/2.fastq')
+else:
+    # read input file
+    sample_list_star_prefix = read_input_star_prefix(args.input_fastq_list)
+
+    # generate list of aligned bam file path
+    star_bam_list = []
+    for sample in sample_list_star_prefix:
+        link_dir = abs_output_root + '/star/' + sample
+        if not os.path.isdir(link_dir): os.mkdir(link_dir)
+        if not os.path.exists(link_dir + '/' + sample + ".Aligned.sortedByCoord.out.bam"): 
+            os.symlink(sample_list_star_prefix[sample] + ".Aligned.sortedByCoord.out.bam", link_dir + '/' + sample + ".Aligned.sortedByCoord.out.bam")
+        if not os.path.exists(link_dir + '/' + sample + ".Chimeric.out.sam"): 
+            os.symlink(sample_list_star_prefix[sample] + ".Chimeric.out.sam", link_dir + '/' + sample + ".Chimeric.out.sam")
+        if not os.path.exists(link_dir + '/' + sample + ".SJ.out.tab"): 
+            os.symlink(sample_list_star_prefix[sample] + ".SJ.out.tab", link_dir + '/' + sample + ".SJ.out.tab")
+        if not os.path.exists(link_dir + '/' + sample + ".Log.final.out"): 
+            os.symlink(sample_list_star_prefix[sample] + ".Log.final.out", link_dir + '/' + sample + ".Log.final.out")
+        if not os.path.exists(link_dir + '/' + sample + ".Aligned.sortedByCoord.out.bam.bai"): 
+            os.symlink(sample_list_star_prefix[sample] + ".Aligned.sortedByCoord.out.bam.bai", link_dir + '/' + sample + ".Aligned.sortedByCoord.out.bam.bai")
+
+        star_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
 
 
 # count virus sequence
-@transform(link_input_fastq, formatter(), "{subpath[0][2]}/virus_count/{subdir[0][0]}/{subdir[0][0]}.virus.selected.txt")
+@active_if(not args.bam)
+@transform(linked_fastq_list, formatter(), "{subpath[0][2]}/virus_count/{subdir[0][0]}/{subdir[0][0]}.virus.selected.txt")
 def task_virus_count(input_files, output_file):
 
     dir_name = os.path.dirname(output_file)
@@ -99,7 +126,7 @@ def task_virus_count(input_files, output_file):
     arguments = {"pythonhome": pipeline_conf.get("env", "PYTHONHOME"),
                  "pythonpath": pipeline_conf.get("env", "PYTHONPATH"),
                  "ld_library_path": pipeline_conf.get("env", "LD_LIBRARY_PATH"),
-                 "genomon_virus_checker": pipeline_conf.get("virus_count", "genomon_virus_checker"),
+                 "genomon_virus_checker": pipeline_conf.get("software", "genomon_virus_checker"),
                  "virus_ref": pipeline_conf.get("virus_count", "virus_reference"),
                  "match_thres": pipeline_conf.get("virus_count", "match_thres"),
                  "select_thres": pipeline_conf.get("virus_count", "select_thres"),
@@ -111,6 +138,7 @@ def task_virus_count(input_files, output_file):
     virus_count.task_exec(arguments)
 
 
+@active_if(not args.bam)
 @follows(task_virus_count)
 @originate([abs_output_root + "/star_ref/" + x + "/SAindex" for x in selected_virus_list(abs_output_root + "/virus_count")])
 def make_star_ref(output_file):
@@ -131,8 +159,10 @@ def make_star_ref(output_file):
     star_ref.task_exec(arguments)
 
 
+@active_if(not args.bam)
 @follows(make_star_ref)
-@transform(link_input_fastq, formatter(), "{subpath[0][2]}/star/{subdir[0][0]}/{subdir[0][0]}.Aligned.sortedByCoord.out.bam")
+@transform(linked_fastq_list, formatter(), "{subpath[0][2]}/star/{subdir[0][0]}/{subdir[0][0]}.Aligned.sortedByCoord.out.bam")
+# @originate(get_sequence_with_virus(abs_output_root, sample_list_fastq))
 def task_star_align(input_files, output_file):
 
     dir_name = os.path.dirname(output_file)
@@ -145,7 +175,9 @@ def task_star_align(input_files, output_file):
         selected_virus = line[0].rstrip('\n')
 
     star_genome = pipeline_conf.get("reference", "star_ref")
+
     if selected_virus != "None":
+        print selected_virus
         star_genome = abs_output_root + "/star_ref/" + selected_virus
 
     arguments = {"star": pipeline_conf.get("software", "star"),
@@ -161,7 +193,9 @@ def task_star_align(input_files, output_file):
     star_align.task_exec(arguments)
 
 
-@transform(task_star_align, formatter(), "{subpath[0][2]}/fusion/{subdir[0][0]}/fusion_fusion.result.txt")
+
+@follows( task_star_align )
+@transform(star_bam_list, formatter(), "{subpath[0][2]}/fusion/{subdir[0][0]}/fusion_fusion.result.txt")
 def task_fusionfusion(input_file, output_file):
 
     input_dir_name = os.path.dirname(input_file)
@@ -172,10 +206,11 @@ def task_fusionfusion(input_file, output_file):
     if not os.path.isdir(output_dir_name): os.mkdir(output_dir_name)
 
     # check the selected virus
-    selected_virus = ""
-    with open(abs_output_root + "/virus_count/" + sample_name + "/" + sample_name + ".virus.selected.txt") as hin:
-        line = hin.readlines()
-        selected_virus = line[0].rstrip('\n')
+    selected_virus = "None" 
+    if args.bam == False:
+        with open(abs_output_root + "/virus_count/" + sample_name + "/" + sample_name + ".virus.selected.txt") as hin:
+            line = hin.readlines()
+            selected_virus = line[0].rstrip('\n')
 
     reference = abs_output_root + "/star_ref/" + selected_virus + "/reference.fa" if selected_virus != "None" \
                     else pipeline_conf.get("reference", "ref_fasta")
@@ -193,6 +228,54 @@ def task_fusionfusion(input_file, output_file):
                  "ld_library_path": pipeline_conf.get("env", "LD_LIBRARY_PATH")}
 
     fusionfusion.task_exec(arguments)
+
+
+@follows( task_star_align )
+@transform(star_bam_list, formatter(), "{subpath[0][2]}/exon_base_count/{subdir[0][0]}/exon_base_count.result.txt")
+def task_exon_base_cont(input_file, output_file):
+
+    input_dir_name = os.path.dirname(input_file)
+    output_dir_name = os.path.dirname(output_file)
+
+    if not os.path.isdir(output_dir_name): os.mkdir(output_dir_name)
+
+
+    arguments = {"input_bam": input_file, 
+                "output": output_file,
+                "region": pipeline_conf.get("exon_base_count", "region"),
+                "exon_bed": pipeline_conf.get("exon_base_count", "exon_file"),
+                "pythonhome": pipeline_conf.get("env", "PYTHONHOME"),
+                "pythonpath": pipeline_conf.get("env", "PYTHONPATH"),
+                "ld_library_path": pipeline_conf.get("env", "LD_LIBRARY_PATH"),
+                "pdl1_pipeline_path" : os.path.abspath(os.path.dirname(__file__)),
+                "samtools": pipeline_conf.get("software", "samtools"),
+                "bedtools": pipeline_conf.get("software", "bedtools")}
+
+    exon_base_count.task_exec(arguments)
+
+
+@follows( task_star_align )
+@transform(star_bam_list, formatter(), "{subpath[0][2]}/expression/{subdir[0][0]}/{subdir[0][0]}.sym2fkpm.txt")
+def task_genomon_expression(input_file, output_file):
+
+    input_dir_name = os.path.dirname(input_file)
+    output_dir_name = os.path.dirname(output_file)
+    output_prefix = output_file.replace(".sym2fkpm.txt", "")
+
+    if not os.path.isdir(output_dir_name): os.mkdir(output_dir_name)
+
+    arguments = {"input_bam": input_file,
+                "output_prefix": output_prefix,
+                "ref_bed": pipeline_conf.get("expression", "gene_bed"),
+                "genomon_expression": pipeline_conf.get("software", "genomon_expression"),
+                "pythonhome": pipeline_conf.get("env", "PYTHONHOME"),
+                "pythonpath": pipeline_conf.get("env", "PYTHONPATH"),
+                "ld_library_path": pipeline_conf.get("env", "LD_LIBRARY_PATH"),
+                "samtools": pipeline_conf.get("software", "samtools"),
+                "bedtools": pipeline_conf.get("software", "bedtools")}
+
+    genomon_expression.task_exec(arguments)
+
 
 pipeline_run(multiprocess = 100)
 
