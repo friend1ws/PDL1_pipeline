@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import sys, os, glob, argparse
+import sys, os, glob, argparse, re
 import ConfigParser
 from ruffus import *
 
@@ -272,7 +272,7 @@ def task_genomon_expression(input_file, output_file):
                 "pythonpath": pipeline_conf.get("env", "PYTHONPATH"),
                 "ld_library_path": pipeline_conf.get("env", "LD_LIBRARY_PATH"),
                 "samtools": pipeline_conf.get("software", "samtools"),
-                "bedtools": pipeline_conf.get("software", "bedtools")}
+                "bedtools_path": re.sub(r'\/bedtools$', '', pipeline_conf.get("software", "bedtools"))}
 
     genomon_expression.task_exec(arguments)
 

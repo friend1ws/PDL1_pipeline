@@ -21,8 +21,10 @@ set -xv
 # set python environment
 export PYTHONHOME={pythonhome}
 export PATH=$PYTHONHOME/bin:$PATH
-export LD_LIBRARY_PATH={ld_library_path}
+export LD_LIBRARY_PATH={ld_library_path}:$LD_LIBRARY_PATH
 export PYTHONPATH={pythonpath}
+
+export PATH={bedtools_path}:$PATH
 
 TOTAL_READ=`{samtools} view {input_bam} | wc -l | cut -f 1 -d ' '`
 SINGLE_READ=`{samtools} view -F 1 {input_bam} | wc -l | cut -f 1 -d ' '`
@@ -33,9 +35,9 @@ echo $SINGLE_OR_PAIR
 
 if [ $SINGLE_OR_PAIR = 0 ]
 then
-    {genomon_expression} {input_bam} {output_prefix} {ref_bed} {bedtools}
+    {genomon_expression} {input_bam} {output_prefix} {ref_bed}
 else
-    {genomon_expression} --keep_improper_pair {input_bam} {output_prefix} {ref_bed} {bedtools}    
+    {genomon_expression} --keep_improper_pair {input_bam} {output_prefix} {ref_bed}
 fi
 
 """
