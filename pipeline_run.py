@@ -71,6 +71,10 @@ if not os.path.isdir(abs_output_root + '/exon_base_count'): os.mkdir(abs_output_
 ###########
 
 linked_fastq_list = []
+star_bam_list = []
+fusion_fusion_bam_list = []
+expression_bam_list = []
+exon_count_bam_list = []
 # if input is fastq
 if not args.bam:
     
@@ -88,16 +92,20 @@ if not args.bam:
                                   abs_output_root + '/fastq/' + sample + '/2.fastq'])
 
     # generate list of aligned bam file path
-    star_bam_list = []
     for sample in sample_list_fastq:
         star_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
-
+        if not os.path.exists(abs_output_root + '/fusion/' + sample + '/fusion_fusion.result.txt'): 
+            fusion_fusion_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
+        if not os.path.exists(abs_output_root + '/expression/' + sample + '/' + sample + ".sym2fkpm.txt"):
+            expression_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
+        if not os.path.exists(abs_output_root + '/exon_base_count/' + sample + '/exon_base_count.result.txt'):
+            exon_count_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
+    
 else:
     # read input file
     sample_list_star_prefix = read_input_star_prefix(args.input_fastq_list)
 
     # generate list of aligned bam file path
-    star_bam_list = []
     for sample in sample_list_star_prefix:
         link_dir = abs_output_root + '/star/' + sample
         if not os.path.isdir(link_dir): os.mkdir(link_dir)
@@ -113,6 +121,12 @@ else:
             os.symlink(sample_list_star_prefix[sample] + ".Aligned.sortedByCoord.out.bam.bai", link_dir + '/' + sample + ".Aligned.sortedByCoord.out.bam.bai")
 
         star_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
+        if not os.path.exists(abs_output_root + '/fusion/' + sample + '/fusion_fusion.result.txt'):
+            fusion_fusion_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
+        if not os.path.exists(abs_output_root + '/expression/' + sample + '/' + sample + ".sym2fkpm.txt"):
+            expression_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
+        if not os.path.exists(abs_output_root + '/exon_base_count/' + sample + '/exon_base_count.result.txt'):
+            exon_count_bam_list.append(abs_output_root + '/star/' + sample + '/' + sample + ".Aligned.sortedByCoord.out.bam")
 
 
 # count virus sequence
@@ -195,7 +209,7 @@ def task_star_align(input_files, output_file):
 
 
 @follows( task_star_align )
-@transform(star_bam_list, formatter(), "{subpath[0][2]}/fusion/{subdir[0][0]}/fusion_fusion.result.txt")
+@transform(fusion_fusion_bam_list, formatter(), "{subpath[0][2]}/fusion/{subdir[0][0]}/fusion_fusion.result.txt")
 def task_fusionfusion(input_file, output_file):
 
     input_dir_name = os.path.dirname(input_file)
@@ -231,7 +245,7 @@ def task_fusionfusion(input_file, output_file):
 
 
 @follows( task_star_align )
-@transform(star_bam_list, formatter(), "{subpath[0][2]}/exon_base_count/{subdir[0][0]}/exon_base_count.result.txt")
+@transform(exon_count_bam_list, formatter(), "{subpath[0][2]}/exon_base_count/{subdir[0][0]}/exon_base_count.result.txt")
 def task_exon_base_cont(input_file, output_file):
 
     input_dir_name = os.path.dirname(input_file)
@@ -255,7 +269,7 @@ def task_exon_base_cont(input_file, output_file):
 
 
 @follows( task_star_align )
-@transform(star_bam_list, formatter(), "{subpath[0][2]}/expression/{subdir[0][0]}/{subdir[0][0]}.sym2fkpm.txt")
+@transform(expression_bam_list, formatter(), "{subpath[0][2]}/expression/{subdir[0][0]}/{subdir[0][0]}.sym2fkpm.txt")
 def task_genomon_expression(input_file, output_file):
 
     input_dir_name = os.path.dirname(input_file)
