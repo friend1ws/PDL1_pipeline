@@ -1,0 +1,142 @@
+NC_022892.1	Human papillomavirus type 167 isolate KC10, complete genome
+NC_022095.1	Human papillomavirus type 179 complete genome, isolate SIBX16
+NC_023891.1	Human papillomavirus type 178, complete genome
+NC_001802.1	Human immunodeficiency virus 1, complete genome
+NC_004104.1	Human papillomavirus type 90, complete genome
+NC_001694.1	Human papillomavirus - 61, complete genome
+NC_001593.1	Human papillomavirus type 53, complete genome
+NC_001538.1	BK polyomavirus, complete genome
+NC_001357.1	Human papillomavirus - 18, complete genome
+NC_001356.1	Human papillomavirus - 1, complete genome
+NC_001352.1	Human papillomavirus - 2, complete genome
+NC_026946.1	Human papillomavirus KC5, complete genome
+NC_027528.1	Human papillomavirus type 201 isolate HPV201, complete genome
+NC_027779.1	UNVERIFIED: Human papillomavirus isolate SE379, complete genome
+NC_003977.2	Hepatitis B virus (strain ayw) genome
+NC_028125.1	Human papillomavirus type 163 isolate KC3, complete genome
+NC_001691.1	Human papillomavirus type 50, complete genome
+NC_001693.1	Human papillomavirus type 60, complete genome
+NC_001690.1	Human papillomavirus type 48, complete genome
+NC_004500.1	Human papillomavirus type 92, complete genome
+NC_001436.1	Human T-lymphotropic virus 1, complete genome
+NC_001595.1	Human papillomavirus type 7, complete genome
+NC_001591.1	Human papillomavirus type 49, complete genome
+NC_001596.1	Human papillomavirus type 9, complete genome
+NC_001676.1	Human papillomavirus 54, complete genome
+NC_001354.1	Human papillomavirus type 41, complete genome
+NC_001458.1	Human papillomavirus type 63, complete genome
+NC_005134.2	Human papillomavirus type 96, complete genome
+NC_001457.1	Human papillomavirus type 4, complete genome
+NC_001576.1	Human papillomavirus type 10, complete genome
+NC_001526.2	Human papillomavirus type 16, complete genome
+NC_001583.1	Human papillomavirus type 26, complete genome
+NC_001586.1	Human papillomavirus type 32, complete genome
+NC_001587.1	Human papillomavirus type 34, complete genome
+NC_001531.1	Human papillomavirus - 5, complete genome
+NC_017993.1	Human papillomavirus type 135, complete genome
+NC_017994.1	Human papillomavirus type 136, complete genome
+NC_017995.1	Human papillomavirus type 137, complete genome
+NC_017996.1	Human papillomavirus type 140, complete genome
+NC_017997.1	Human papillomavirus type 144, complete genome
+NC_008188.1	Human papillomavirus type 103, complete genome
+NC_008189.1	Human papillomavirus type 101, complete genome
+NC_010329.1	Human papillomavirus type 88, complete genome
+NC_012213.1	Human papillomavirus type 108, complete genome
+NC_012486.1	Human papillomavirus type 112, complete genome
+NC_012485.1	Human papillomavirus type 109, complete genome
+NC_013035.1	Human papillomavirus 116, complete genome
+NC_014185.1	Human papillomavirus 121, complete genome
+NC_014952.1	Human papillomavirus type 128, complete genome
+NC_014953.1	Human papillomavirus type 129, complete genome
+NC_014954.1	Human papillomavirus type 131, complete genome
+NC_014955.1	Human papillomavirus type 132, complete genome
+NC_014956.1	Human papillomavirus type 134, complete genome
+NC_016157.1	Human papillomavirus type 126, complete genome
+NC_006273.2	Human herpesvirus 5 strain Merlin, complete genome
+NC_021483.1	Human papillomavirus type 154 isolate PV77, complete genome
+NC_001355.1	Human papillomavirus type 6b, complete genome
+NC_019023.1	Human papillomavirus type 166 isolate KC9, complete genome
+V00866.1	Hepatitis B virus complete DNA sequence (subtype adw)
+X02763.1	Hepatitis b virus genome (serotype adw2)
+X69798.1	Hepatitis B virus, subtype adw4 genes
+V01460.1	Hepatitis B virus (strain ayw) genome
+X02496.1	Human hepatitis B virus strain ayw variant
+D00630.1	HPBADRC Hepatitis B virus subtype adr genomic DNA, complete sequence
+D00329.1	HPBADW1 Hepatitis B virus subtype ADW genomic DNA, complete genome, clone: pJDW233
+D00330.1	HPBADW2 Hepatitis B virus subtype ADW genomic DNA, complete genome, clone: pODW282
+D90400.1	PPH58 Human papillomavirus type 58 complete genome
+J04353.1	PPH31A Human papillomavirus type 31 (HPV-31) complete genome
+M12732.1	PPH33CG Human papillomavirus type 33, complete genome
+M62849.1	PPHT39 Human papillomavirus ORFs
+X74479.1	Human papillomavirus type 45 genomic DNA
+X74481.1	Human papillomavirus type 52 genomic DNA
+X74483.1	Human papillomavirus type 56 genomic DNA
+X75657.1	Human hepatitis virus (genotype E, Bas) preS1, preS2, S, C, X, antigens, core antigen, X protein and polymerase
+X75665.1	Human hepatitis virus (genotype C, HMA) preS1, preS2, S, C, X, antigens, core antigen, X protein and polymerase
+X75658.1	Human hepatitis virus (genotype F, Fou) preS1, preS2, S, C, X, antigens, core antigen, X protein and polymerase
+X75656.1	Human hepatitis virus (genotype C, Cha) preS1, preS2, S, C, X, antigens, core antigen X, antigens, core antigen, X protein and polymerase
+X77858.1	Human papilloma virus type 59, complete viral genome
+D23677.1	HPBA1HKK2 Hepatitis B virus (A1-HBVKK2) complete genome sequence
+X80926.1	Hepatitis B virus (patient 5) complete genome
+X80925.1	Hepatitis B virus (patient 6) complete genome
+U21941.1	HPU21941 Human papillomavirus type 70, complete genome
+U95551.1	Hepatitis B virus subtype ayw, complete genome
+AF043594.1	Hepatitis B virus isolate 1/91, complete genome
+AF046996.1	Woolly monkey hepatitis B Virus, complete genome
+AF068756.1	Hepatitis B virus, complete genome
+AB031265.1	Hepatitis B virus genomic DNA, complete sequence, isolate:HBV VietF-2
+AB031267.1	Hepatitis B virus genomic DNA, complete sequence, isolate:HBV VietF-6
+AB033550.1	Hepatitis B virus DNA, complete genome
+AB033554.1	Hepatitis B virus DNA, complete genome, isolate:RTB299
+AB033558.1	Hepatitis B virus DNA, complete genome, isolate:JYW796
+AB033559.1	Hepatitis B virus DNA, complete genome, isolate:PYW310
+AB027020.1	Human papillomavirus type 69 DNA, complete genome
+AF160501.1	Hepatitis B virus strain IG29227, complete genome
+M57663.2	HPBADWZCG Hepatitis B virus subtype adw, complete genome
+AB048702.1	Hepatitis B virus DNA, complete genome, serotype:ayw
+AB048704.1	Hepatitis B virus DNA, complete genome, serotype:ayw
+AB048705.1	Hepatitis B virus DNA, complete genome, serotype:ayw
+AB056513.1	Hepatitis B virus DNA, complete genome, clone:USG17
+AB059659.1	Hepatitis B virus DNA, complete genome, clone:US10
+AY033073.1	Hepatitis B virus serotype ayw1, complete genome
+AB073838.1	Hepatitis B virus DNA, complete genome, isolate:HBV-Ho7
+AY090458.1	Hepatitis B virus strain 70H, complete genome
+AF533983.1	Hepatitis B virus genotype C, complete genome
+AB091255.1	Hepatitis B virus DNA, complete genome, isplate:ABI-129
+AB106564.1	Hepatitis B virus DNA, complete genome, isolate:HBV-GA325
+AY233278.1	Hepatitis B virus isolate 1 complete genome
+AB115551.1	Hepatitis B virus DNA, complete genome, isolate:HBV-CB15
+AB231908.1	Hepatitis B virus DNA, complete genome, isolate: HBV-VH24
+DQ315779.1	Hepatitis B virus isolate EI0399, complete genome
+DQ463787.1	Hepatitis B virus isolate 928-9_1979, complete genome
+AB287314.1	Hepatitis B virus DNA, complete genome, isolate: Alaska433
+AM494716.1	Hepatitis B virus complete genome, isolate CAR175
+DQ995647.1	Human coxsackievirus A22 strain ban99-10427, complete genome
+EU670263.1	Hepatitis B virus isolate ph105, complete genome
+AB375160.1	Hepatitis B virus DNA, complete genome, strain: MEXICO30-H
+FJ023664.1	Hepatitis B virus isolate I2_M04-0026, complete genome
+AB493842.1	Hepatitis B virus DNA, complete genome, isolate: 31UC
+AB493846.1	Hepatitis B virus DNA, complete genome, isolate: 17UC
+FJ904394.1	Hepatitis B virus isolate A7, complete genome
+AP011084.1	Hepatitis B virus DNA, complete genome, strain: B0503341(PTK)F
+AP011085.1	Hepatitis B virus DNA, complete genome, strain: B0612746(JKT)F
+AP011086.1	Hepatitis B virus DNA, complete genome, strain: B0503233(BJS)F
+AP011087.1	Hepatitis B virus DNA, complete genome, strain: B0607171(KDR)F
+AP011088.1	Hepatitis B virus DNA, complete genome, strain: B0503213(MKS)F
+AP011090.1	Hepatitis B virus DNA, complete genome, strain: B0714189(WBK)F
+AP011091.1	Hepatitis B virus DNA, complete genome, strain: B0714202(BMA)F
+AP011093.1	Hepatitis B virus DNA, complete genome, strain: B0308839(DPS)F
+AP011094.1	Hepatitis B virus DNA, complete genome, strain: B0503102(DIL)F
+AP011097.1	Hepatitis B virus DNA, complete genome, strain: C0503296(PTK)F
+AP011098.1	Hepatitis B virus DNA, complete genome, strain: C0714154(WBK)F
+AP011099.1	Hepatitis B virus DNA, complete genome, strain: C0503222(MND)F
+AP011100.1	Hepatitis B virus DNA, complete genome, strain: C0607174(THN)F
+AP011101.1	Hepatitis B virus DNA, complete genome, strain: C0715697(TNT)F
+AP011102.1	Hepatitis B virus DNA, complete genome, strain: C0610090(BIK)F
+AP011104.1	Hepatitis B virus DNA, complete genome, strain: C0309374(DPS)F
+AP011105.1	Hepatitis B virus DNA, complete genome, strain: C0309392(DPS)F
+AP011106.1	Hepatitis B virus DNA, complete genome, strain: C0503236(BJS)F
+AP011108.1	Hepatitis B virus DNA, complete genome, strain: C0503133(DIL)F
+AB486012.1	Hepatitis B virus DNA, complete genome, clone: JRB34
+AB540583.1	HBV genotype C DNA, complete genome, strain: C0901177(NT3)
+FR751039.1	Human papillomavirus type 68b, complete genome
