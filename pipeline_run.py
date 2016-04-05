@@ -62,6 +62,7 @@ if not os.path.isdir(abs_output_root + '/script'): os.mkdir(abs_output_root + '/
 if not os.path.isdir(abs_output_root + '/log'): os.mkdir(abs_output_root + '/log')
 if not os.path.isdir(abs_output_root + '/fastq'): os.mkdir(abs_output_root + '/fastq')
 if not os.path.isdir(abs_output_root + '/virus_count'): os.mkdir(abs_output_root + '/virus_count')
+if not os.path.isdir(abs_output_root + '/virus_selected'): os.mkdir(abs_output_root + '/virus_selected')
 if not os.path.isdir(abs_output_root + '/star_ref'): os.mkdir(abs_output_root + '/star_ref')
 if not os.path.isdir(abs_output_root + '/star'): os.mkdir(abs_output_root + '/star')
 if not os.path.isdir(abs_output_root + '/fusion'): os.mkdir(abs_output_root + '/fusion')
@@ -71,6 +72,7 @@ if not os.path.isdir(abs_output_root + '/exon_base_count'): os.mkdir(abs_output_
 ###########
 
 linked_fastq_list = []
+virus_check_seq_list = []
 star_bam_list = []
 fusion_fusion_bam_list = []
 expression_bam_list = []
@@ -90,6 +92,10 @@ if not args.bam:
         if not os.path.exists(link_dir + '/2.fastq'): os.symlink(sample_list_fastq[sample][1], link_dir + '/2.fastq')
         linked_fastq_list.append([abs_output_root + '/fastq/' + sample + '/1.fastq',
                                   abs_output_root + '/fastq/' + sample + '/2.fastq'])
+
+        if not os.path.exists(abs_output_root + '/virus_count/' + sample + '/' + sample + '.virus.selected.txt'):
+            virus_check_seq_list.append([abs_output_root + '/fastq/' + sample + '/1.fastq',
+                                         abs_output_root + '/fastq/' + sample + '/2.fastq'])
 
     # generate list of aligned bam file path
     for sample in sample_list_fastq:
@@ -131,7 +137,7 @@ else:
 
 # count virus sequence
 @active_if(not args.bam)
-@transform(linked_fastq_list, formatter(), "{subpath[0][2]}/virus_count/{subdir[0][0]}/{subdir[0][0]}.virus.selected.txt")
+@transform(virus_check_seq_list, formatter(), "{subpath[0][2]}/virus_count/{subdir[0][0]}/{subdir[0][0]}.virus.selected.txt")
 def task_virus_count(input_files, output_file):
 
     dir_name = os.path.dirname(output_file)
@@ -154,11 +160,47 @@ def task_virus_count(input_files, output_file):
 
 @active_if(not args.bam)
 @follows(task_virus_count)
-@originate([abs_output_root + "/star_ref/" + x + "/SAindex" for x in selected_virus_list(abs_output_root + "/virus_count")])
-def make_star_ref(output_file):
+@merge(task_virus_count, abs_output_root + '/virus_count/virus.selected.merged.txt')
+def virus_selected_merge(input_files, output_file):
 
+    hout = open(output_file, 'w')
+    print >> hout, '\n'.join(selected_virus_list(abs_output_root + "/virus_count"))
+    hout.close()
+
+
+@active_if(not args.bam)
+@follows(virus_selected_merge)
+@subdivide(virus_selected_merge, formatter(), "{subpath[0][1]}/virus_selected/*")
+def virus_selected_split(input_file, output_files):
+
+    for file in output_files:
+        print file
+        os.unlink(file)
+
+    output_dir = os.path.dirname(os.path.dirname(input_file)) + '/virus_selected'
+    with open(input_file, 'r') as hin:
+        for line in hin:
+            hout = open(output_dir + '/' + line.rstrip('\n'), 'w')
+            # print >> hout, "touch"
+            hout.close()
+
+    print output_files
+
+
+@active_if(not args.bam)
+# @follows(virus_selected_split)
+# @originate([abs_output_root + "/star_ref/" + x + "/SAindex" for x in selected_virus_list(abs_output_root + "/virus_count")])
+@transform(virus_selected_split, formatter(), "{subpath[0][1]}/star_ref/{basename[0]}/SAindex")
+# @transform(virus_selected_split, suffix(".txt"), "{subpath[0][2]}/star_ref/{basename[0]}/SAindex")
+def make_star_ref(input_file, output_file):
+
+    print input_file + '\t' + output_file
     star_ref_dir = os.path.dirname(output_file) 
-    selected_virus = os.path.basename(star_ref_dir)
+    # selected_virus = os.path.basename(star_ref_dir)
+
+    print star_ref_dir
+
+    selected_virus = os.path.basename(input_file)
 
     if not os.path.isdir(star_ref_dir): os.mkdir(star_ref_dir)
     print_virus_seq(pipeline_conf.get("virus_count", "virus_reference"),
