@@ -5,7 +5,7 @@ script for CD274 analysis
 
 ## Introduction
 
-PDL1_pipeline is pipeline program for analysing cancer transcriptome sequencing data and used in Kataoka et al., in submission.
+PDL1_pipeline is pipeline program for analysing cancer transcriptome sequencing data and used in Kataoka et al., (Nature, Accepted).
 Briefly, this program performs viral sequence detection, sequence alignment, gene fusion detection, gene expression analysis and so on.
 
 ## Dependency
